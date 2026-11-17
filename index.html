@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Keeps the site out of search engines -->
+<meta name="robots" content="noindex, nofollow">
+<title>The Teddi List</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><circle cx='60' cy='60' r='58' fill='%23f6e3dc'/><path d='M32 82 C 47 32, 73 97, 88 40' stroke='%23c8553d' stroke-width='5' fill='none' stroke-dasharray='3 10' stroke-linecap='round'/><circle cx='32' cy='82' r='20' fill='%232b2220'/><circle cx='88' cy='40' r='20' fill='%23c8553d'/><text x='32' y='83' text-anchor='middle' dominant-baseline='central' font-family='Georgia,serif' font-weight='700' font-size='24' fill='%23fbf6f1'>M</text><text x='88' y='41' text-anchor='middle' dominant-baseline='central' font-family='Georgia,serif' font-weight='700' font-size='24' fill='%23fbf6f1'>T</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbf6f1;
+    --card: #ffffff;
+    --ink: #2b2220;
+    --muted: #8a7a74;
+    --accent: #c8553d;
+    --accent-soft: #f6e3dc;
+    --line: #eadfd8;
+    --done: #7a9e7e;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  header {
+    text-align: center;
+    padding: 56px 20px 24px;
+  }
+  header h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+  header h1 span { color: var(--accent); }
+  header p { margin: 0; color: var(--muted); }
+  .logo { width: 104px; height: 104px; display: block; margin: 0 auto 14px; filter: drop-shadow(0 6px 14px rgba(43,34,32,.12)); transition: transform .3s ease; }
+  .logo:hover { transform: scale(1.06); }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 20px 8px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  nav button, .chip, .surprise {
+    font: inherit;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  nav button:hover, .chip:hover { border-color: var(--accent); }
+  nav button.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 16px 20px 80px; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0 20px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { padding: 6px 14px; font-size: .88rem; }
+  .chip.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .surprise {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .surprise:hover { filter: brightness(1.05); }
+
+  .progress { color: var(--muted); font-size: .9rem; margin-bottom: 16px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(43,34,32,.06); }
+  .card.highlight { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .card.is-done { opacity: .6; }
+  .card.is-done h3 { text-decoration: line-through; text-decoration-color: var(--done); }
+  .card .emoji { font-size: 1.8rem; line-height: 1; }
+  .card h3 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin: 4px 0 0;
+  }
+  .card p { margin: 0; color: #5a4c47; font-size: .95rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .tag {
+    font-size: .75rem;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 2px 10px;
+    border-radius: 999px;
+    color: var(--muted);
+  }
+  .card label {
+    margin-top: auto;
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .88rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  .card input[type="checkbox"] { accent-color: var(--done); width: 16px; height: 16px; }
+  .card a { color: var(--accent); font-size: .9rem; }
+
+  .empty { color: var(--muted); text-align: center; padding: 40px 0; grid-column: 1 / -1; }
+
+
+  .open-list {
+    font: inherit;
+    align-self: flex-start;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .open-list:hover { background: var(--accent); color: #fff; }
+
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(43,34,32,.45);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    z-index: 100;
+  }
+  .overlay.show { display: flex; }
+  .panel {
+    background: var(--bg);
+    border-radius: 20px;
+    width: 100%; max-width: 640px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 24px 24px 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; }
+  .panel h2 { font-family: "Fraunces", Georgia, serif; font-weight: 600; margin: 0; font-size: 1.7rem; }
+  .close {
+    font: inherit; font-size: 1.6rem; line-height: 1;
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--line); background: var(--card); cursor: pointer;
+  }
+  .panel .progress { margin: 6px 0 4px; }
+  .group {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600; font-size: 1.15rem;
+    margin: 22px 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  ul.sub { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  ul.sub li {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  ul.sub li label { padding-top: 3px; cursor: pointer; }
+  ul.sub li input { accent-color: var(--done); width: 16px; height: 16px; }
+  ul.sub li p { margin: 2px 0 4px; color: #5a4c47; font-size: .9rem; }
+  ul.sub li a { color: var(--accent); font-size: .85rem; }
+  ul.sub li.is-done { opacity: .6; }
+  ul.sub li.is-done strong { text-decoration: line-through; text-decoration-color: var(--done); }
+
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 20px 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Teddi List logo">
+    <circle cx="60" cy="60" r="56" fill="#f6e3dc"/>
+    <path d="M32 82 C 47 32, 73 97, 88 40" stroke="#c8553d" stroke-width="4" fill="none" stroke-dasharray="2 9" stroke-linecap="round"/>
+    <circle cx="32" cy="82" r="14" fill="#2b2220"/>
+    <circle cx="88" cy="40" r="14" fill="#c8553d"/>
+    <text x="32" y="82" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="16" fill="#fbf6f1">M</text>
+    <text x="88" y="40" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, Georgia, serif" font-weight="600" font-size="16" fill="#fbf6f1">T</text>
+  </svg>
+  <h1>The Teddi <span>List</span></h1>
+  <p>Dates to plan, places to eat, trips to take — together.</p>
+</header>
+
+<nav id="tabs"></nav>
+
+<main>
+  <div class="toolbar">
+    <div class="chips" id="chips"></div>
+    <button class="surprise" id="surprise">✨ Surprise us</button>
+  </div>
+  <div class="progress" id="progress"></div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>Made for two. ♥</footer>
+
+<div class="overlay" id="overlay"><div class="panel" id="panel"></div></div>
+
+<script>
+/* =========================================================
+   EDIT YOUR CONTENT HERE
+   ---------------------------------------------------------
+   Each entry needs: title, text, tags (a list), emoji.
+   Optional: link (a URL), and "area"/"price" for restaurants.
+   To add an idea: copy one { ... } block, paste it below,
+   and change the words. Keep the commas between blocks.
+   ========================================================= */
+
+const SECTIONS = {
+  dates: {
+    label: "💌 Date ideas",
+    items: [
+      { emoji: "🌅", title: "Sunset beach walk", text: "Walk along Scheveningen beach at golden hour, then warm up with hot chocolate.", tags: ["outdoors", "free"] },
+      { emoji: "🚲", title: "Bike to the dunes", text: "Cycle out to Meijendel with a packed lunch and get a little lost on the trails.", tags: ["outdoors", "active"] },
+      { emoji: "🧺", title: "Picnic in the park", text: "Bread, cheese, fruit and a blanket in the Haagse Bos. Bring a card game.", tags: ["outdoors", "cheap"] },
+      { emoji: "🖼️", title: "Museum date", text: "Pick one painting each that you'd hang at home, then explain why over coffee. Tap to see all the museums.", tags: ["indoors", "culture"], opens: "museums" },
+      { emoji: "🍝", title: "Cook a country", text: "Choose a country you want to visit and cook a full dinner from it together.", tags: ["at home", "cheap"] },
+      { emoji: "🎬", title: "Themed movie night", text: "Pick a theme, make matching snacks, and each choose one film.", tags: ["at home", "cheap"] },
+      { emoji: "🎲", title: "Board game café", text: "Try a game neither of you has played before. Loser picks the next date.", tags: ["indoors"] },
+      { emoji: "🔭", title: "Stargazing", text: "Find a dark spot, bring blankets and a stargazing app, and name your own constellation.", tags: ["outdoors", "free"] },
+      { emoji: "👩‍🍳", title: "Cooking class", text: "Learn something neither of you can make yet — pasta, sushi, dumplings.", tags: ["indoors", "splurge"] },
+      { emoji: "🛍️", title: "Flea market hunt", text: "€10 each: find the weirdest or best gift for the other person.", tags: ["outdoors", "cheap"] },
+      { emoji: "✉️", title: "Letters to future us", text: "Write letters to open in a year. Seal them and hide them somewhere safe.", tags: ["at home", "free"] },
+      { emoji: "🐐", title: "Petting zoo", text: "Feed the goats and cuddle the bunnies at a kinderboerderij — most are free.", tags: ["outdoors", "free"] },
+      { emoji: "🍻", title: "Big night out", text: "Bar-hop, dance until late, and grab fries on the way home.", tags: ["night out"] },
+      { emoji: "🏠", title: "Gingerbread house", text: "Build (and inevitably eat) a gingerbread house together. Judge each other's decorating.", tags: ["at home", "winter", "cheap"] },
+      { emoji: "🛋️", title: "Blanket fort film night", text: "Build a fort out of every blanket and pillow you own, add fairy lights, and watch a film inside.", tags: ["at home", "cozy", "free"] },
+      { emoji: "🎸", title: "Music store in Voorburg", text: "Browse the records and instruments, then pick something for each other.", tags: ["indoors", "Voorburg"] },
+      { emoji: "🏺", title: "Pottery or painting class", text: "Throw some wonky mugs or paint portraits of each other.", tags: ["indoors", "creative"] },
+      { emoji: "🔐", title: "Escape room", text: "Lock yourselves in and solve puzzles against the clock as a team.", tags: ["indoors"] },
+      { emoji: "🎳", title: "Bowling or karaoke", text: "The worse you are, the more fun it is.", tags: ["indoors", "night out"] },
+      { emoji: "🧗", title: "Bouldering", text: "Indoor climbing — active, and you have to trust each other.", tags: ["indoors", "active"] },
+      { emoji: "🐠", title: "Aquarium", text: "Sea Life in Scheveningen — calm and dreamy on a rainy day.", tags: ["indoors"] },
+      { emoji: "🕹️", title: "Arcade night", text: "Retro games, keep score, and demand a rematch.", tags: ["indoors", "night out"] },
+      { emoji: "🎤", title: "Comedy night", text: "Stand-up or open mic — cheap, and plenty to talk about after.", tags: ["indoors", "night out", "cheap"] },
+      { emoji: "🍿", title: "Cinema double feature", text: "Two films back to back with dinner in between.", tags: ["indoors"] },
+      { emoji: "🧀", title: "Tasting night", text: "Wine, cheese or chocolate — book a class or set one up yourselves.", tags: ["indoors", "at home"] },
+      { emoji: "⛸️", title: "Ice skating", text: "Indoor rink, or a pop-up outdoor one in winter. Hold hands, try not to fall.", tags: ["active", "winter"] },
+      { emoji: "🧁", title: "Bake-off", text: "Same recipe, separate bowls, blind taste test at the end.", tags: ["at home", "cheap"] },
+      { emoji: "🛁", title: "Spa night", text: "Face masks, candles, a long bath and massages.", tags: ["at home", "cozy"] },
+      { emoji: "🧩", title: "Puzzle & playlist night", text: "A 1,000-piece puzzle and a playlist you build together.", tags: ["at home", "cozy", "cheap"] },
+      { emoji: "🎨", title: "Paint-and-sip", text: "Cheap canvases, paint and wine, following a YouTube tutorial.", tags: ["at home", "creative"] },
+      { emoji: "💞", title: "Recreate our first date", text: "Same food, same music, same outfits — at home.", tags: ["at home"] },
+      { emoji: "🗺️", title: "Plan a dream trip", text: "Pick a destination and plan it in full detail, budget included.", tags: ["at home", "free"] },
+      { emoji: "🫕", title: "Fondue or raclette night", text: "Slow, cozy and very Dutch-winter.", tags: ["at home", "cozy", "winter"] },
+      { emoji: "💃", title: "Learn a dance", text: "Salsa or a silly TikTok routine, from video lessons.", tags: ["at home", "active", "free"] },
+      { emoji: "❓", title: "Deep questions game", text: "A card deck like We're Not Really Strangers, or 36 questions to ask each other.", tags: ["at home", "free"] },
+      { emoji: "📸", title: "Make a scrapbook", text: "Print your phone photos and make a memory book of us.", tags: ["at home", "creative"] },
+    ]
+  },
+
+  restaurants: {
+    label: "🍷 Restaurants",
+    // The category buttons, in this order. Add or remove names freely.
+    categories: ["Bakeries", "Burgers", "Chinese", "Japanese", "Indian", "Korean", "Thai", "Vietnamese", "Indonesian", "Surinamese", "French", "Greek", "Middle Eastern", "Turkish", "Mexican", "Spanish"],
+    // To add a place: copy a line, set "category" to one of the names above,
+    // and put the city in "tags". The map link is made automatically.
+    items: [
+      // --- Burgers (all mid-range: aim for burger + fries + drink under €25 each) ---
+      { emoji: "🍔", category: "Burgers", title: "Burgers 'n Freakin' Fries", text: "American-style smash burgers and loaded fries near Den Haag Centraal. Halal beef.", tags: ["The Hague"] },
+      { emoji: "🥩", category: "Burgers", title: "Day Dream Deli", text: "Burgers and Montreal pastrami. Try the Old Amsterdam or the truffle burger.", tags: ["The Hague"] },
+      { emoji: "🇫🇷", category: "Burgers", title: "Frenchie's Burgers", text: "Crispy smash burgers with everything homemade. Get the zucchini tempura on the side.", tags: ["The Hague"] },
+      { emoji: "🌱", category: "Burgers", title: "Beesechurgers", text: "Fully vegan burgers, sweet potato fries and milkshakes. Google shows no opening hours right now, so check before you go.", tags: ["The Hague", "vegan"] },
+      { emoji: "🎩", category: "Burgers", title: "Ich Bin Ein Hamburger", text: "Fancy 1920s-style room with a glass roof — burgers around €14. Google shows no opening hours right now, so check before you go.", tags: ["The Hague"] },
+      { emoji: "🔥", category: "Burgers", title: "Maijard Smashburgers", text: "Crispy smash burgers and loaded fries, about €15 for a burger.", tags: ["Amsterdam"] },
+      { emoji: "🍺", category: "Burgers", title: "The Beef Chief", text: "Juicy burgers and craft beer in Amsterdam Noord. Open Wednesday to Sunday.", tags: ["Amsterdam"] },
+      { emoji: "🍟", category: "Burgers", title: "Le Smash", text: "Self-service smash burger spot in De Pijp. Get the Le Special and cheese fries.", tags: ["Amsterdam"] },
+      { emoji: "🌙", category: "Burgers", title: "Burgerbar Kolksteeg", text: "Build-your-own burgers in the centre, open until after midnight.", tags: ["Amsterdam"] },
+      { emoji: "⛵", category: "Burgers", title: "De Ark van Delft", text: "Classic burger joint with thick-cut fries and good vegan options.", tags: ["Delft"] },
+      { emoji: "🍻", category: "Burgers", title: "Moeke Delft", text: "Café on the Beestenmarkt with a great terrace. Order the Moeke burger.", tags: ["Delft"] },
+      { emoji: "💋", category: "Burgers", title: "American Steakhouse Betty Boop", text: "Retro American diner on the Koornmarkt. Stick to the burgers (try the lamb one) to stay in budget — the steaks cost more.", tags: ["Delft"] },
+      { emoji: "🐈", category: "Burgers", title: "The Cat's Back", text: "Cosy bar with craft beer, DJs and what locals call the best smash burger in Tilburg. Google shows no opening hours right now, so check before you go.", tags: ["Tilburg"] },
+      { emoji: "🏪", category: "Burgers", title: "Woeste Burgers", text: "Burger stand in the Foodmarket — order from your table and mix with other stalls.", tags: ["Tilburg"] },
+      { emoji: "🛵", category: "Burgers", title: "Burger Brothers", text: "Takeaway and delivery only — perfect for a burger night in. Great spiral fries.", tags: ["Tilburg", "takeaway"] },
+
+      // --- Chinese ---
+      { emoji: "🥟", category: "Chinese", title: "Chang'an Flavour", text: "Xi'an-style hand-pulled biang biang noodles, 5 minutes from the Mauritshuis.", tags: ["The Hague"] },
+      { emoji: "🥟", category: "Chinese", title: "Winston & Wei Wei", text: "Down-to-earth and well priced, near Hollands Spoor.", tags: ["The Hague"] },
+      { emoji: "🥟", category: "Chinese", title: "Full Moon City", text: "Busy Chinatown classic for dim sum and Peking duck.", tags: ["The Hague"] },
+      { emoji: "🥟", category: "Chinese", title: "Xiang Amsterdam", text: "Spicy Hunan cuisine in the centre.", tags: ["Amsterdam"] },
+      { emoji: "🥟", category: "Chinese", title: "Miduo Chinese Cuisine", text: "Noodles and Chinese comfort food near Leidseplein.", tags: ["Amsterdam"] },
+      { emoji: "🥟", category: "Chinese", title: "Restaurant Klein maar Fijn", text: "Small and friendly. Try the lak kai and the spicy yellow sambal.", tags: ["Delft"] },
+      { emoji: "🥟", category: "Chinese", title: "TuTu Malatang", text: "Pick your own ingredients for a spicy malatang soup bowl.", tags: ["Delft"] },
+      { emoji: "🥟", category: "Chinese", title: "Tensum", text: "Homemade dim sum. Locals call it the best Chinese in Tilburg.", tags: ["Tilburg"] },
+
+      // --- Japanese ---
+      { emoji: "🍜", category: "Japanese", title: "Takumi Tonkotsu Ramen Den Haag Centrum", text: "Rich tonkotsu ramen in Chinatown.", tags: ["The Hague"] },
+      { emoji: "🍜", category: "Japanese", title: "Ramen Kitanoya", text: "Chewy noodles, spicy broth and juicy gyoza — and short waits.", tags: ["The Hague"] },
+      { emoji: "🍜", category: "Japanese", title: "Japanese Restaurant SET", text: "Sushi, ramen and dim sum. Good value.", tags: ["The Hague"] },
+      { emoji: "🍜", category: "Japanese", title: "Ramen Kingdom", text: "Famous ramen spot near Centraal. Expect a short queue.", tags: ["Amsterdam"] },
+      { emoji: "🍜", category: "Japanese", title: "Tsukimi Ramen", text: "Huge bowls on the Damrak, served fast.", tags: ["Amsterdam"] },
+      { emoji: "🍜", category: "Japanese", title: "Washoku Ramen", text: "Great ramen — careful with the spicy oil!", tags: ["Delft"] },
+      { emoji: "🍜", category: "Japanese", title: "Ramen Nikkou", text: "Tiny, authentic ramen bar with Japanese rock playing.", tags: ["Delft"] },
+      { emoji: "🍜", category: "Japanese", title: "Akisushi Tilburg", text: "Fresh sushi and poke bowls at low prices.", tags: ["Tilburg"] },
+
+      // --- Indian ---
+      { emoji: "🍛", category: "Indian", title: "Indian By Nature", text: "Rich, deep flavours in the centre. The goat curry is the star.", tags: ["The Hague"] },
+      { emoji: "🍛", category: "Indian", title: "Mad'Ras Indian Restaurant Den Haag", text: "Authentic spread from starters to dessert in Zeeheldenkwartier.", tags: ["The Hague"] },
+      { emoji: "🍛", category: "Indian", title: "Chopras Indian Restaurant Den Haag", text: "Fresh, aromatic food with lots of vegan options.", tags: ["The Hague"] },
+      { emoji: "🍛", category: "Indian", title: "Rasoi", text: "North Indian curries and tandoori in Zuid.", tags: ["Amsterdam"] },
+      { emoji: "🍛", category: "Indian", title: "Lumbini Restaurant", text: "Warm and cosy near Muntplein. Get the cheese naan.", tags: ["Amsterdam"] },
+      { emoji: "🍛", category: "Indian", title: "Kokam", text: "Home-style cooking by chef Tejashree — book ahead and come hungry.", tags: ["Delft"] },
+      { emoji: "🍛", category: "Indian", title: "Maharaja Restaurant", text: "Friendly, lots of veggie options. Try the lamb biryani.", tags: ["Delft"] },
+      { emoji: "🍛", category: "Indian", title: "Biryani Tandoori & Sweets", text: "Pakistani and North Indian: tandoori chicken and lamb curry.", tags: ["Tilburg"] },
+
+      // --- Korean ---
+      { emoji: "🇰🇷", category: "Korean", title: "K-Bunsik", text: "Korean street food — try the spicy pork.", tags: ["The Hague"] },
+      { emoji: "🇰🇷", category: "Korean", title: "Sojubar Den Haag", text: "Korean fried chicken, beer and soju in the centre.", tags: ["The Hague"] },
+      { emoji: "🇰🇷", category: "Korean", title: "Kim's So Korean Food Centrum", text: "Bulgogi, hot pot and lots to share.", tags: ["Amsterdam"] },
+      { emoji: "🇰🇷", category: "Korean", title: "Nomi Leidseplein", text: "All-you-can-eat Korean/Japanese BBQ — great value.", tags: ["Amsterdam"] },
+      { emoji: "🇰🇷", category: "Korean", title: "Inza's Seoulkitchen", text: "Beautifully made Korean dishes on Willem II Straat.", tags: ["Tilburg"] },
+      { emoji: "🇰🇷", category: "Korean", title: "Jinsang BBQ Tilburg", text: "Korean BBQ grilled at your table by the Piushaven.", tags: ["Tilburg"] },
+
+      // --- Thai ---
+      { emoji: "🍲", category: "Thai", title: "Tuk's Thai Food", text: "Small, warm Thai place. Pad thai and beef curry.", tags: ["The Hague"] },
+      { emoji: "🍲", category: "Thai", title: "Niyom Thai", text: "Quick and tasty, good for takeaway on Noordeinde.", tags: ["The Hague"] },
+      { emoji: "🍲", category: "Thai", title: "Maenaam Thai Restaurant", text: "Long, narrow and always busy. Get the pad kra pao.", tags: ["Amsterdam"] },
+      { emoji: "🍲", category: "Thai", title: "Siam Thai Restaurant", text: "Fresh, delicious Thai in the centre.", tags: ["Amsterdam"] },
+      { emoji: "🍲", category: "Thai", title: "The Best Thai Food Delft", text: "On the Markt — authentic flavours and generous portions.", tags: ["Delft"] },
+      { emoji: "🍲", category: "Thai", title: "Sujitra Thai Kitchen", text: "Small Thai kitchen near the station.", tags: ["Tilburg"] },
+      { emoji: "🍲", category: "Thai", title: "Charm Thai Takeaway", text: "Takeaway Thai curries for a night in.", tags: ["Tilburg"] },
+
+      // --- Vietnamese ---
+      { emoji: "🍜", category: "Vietnamese", title: "Vina's Noodles & More", text: "Noodles with plenty of vegan options.", tags: ["The Hague"] },
+      { emoji: "🍜", category: "Vietnamese", title: "VuVu The Hague", text: "Hidden gem with big, authentic portions — pho and bún thịt nướng.", tags: ["The Hague"] },
+      { emoji: "🍜", category: "Vietnamese", title: "Little V Den Haag", text: "Themed décor and great pho in Chinatown.", tags: ["The Hague"] },
+      { emoji: "🍜", category: "Vietnamese", title: "Banh Mi King Amsterdam", text: "Cheap banh mi sandwiches near Centraal.", tags: ["Amsterdam"] },
+      { emoji: "🍜", category: "Vietnamese", title: "Pho King", text: "Tiny, cosy pho spot. There may be a short line.", tags: ["Amsterdam"] },
+      { emoji: "🍜", category: "Vietnamese", title: "Ben Sandwiches", text: "Huge pork-belly banh mi for under €10.", tags: ["Delft"] },
+      { emoji: "🍜", category: "Vietnamese", title: "Tan Vietnamese Snacks", text: "Street stand for spring rolls and fried snacks.", tags: ["Delft"] },
+      { emoji: "🍜", category: "Vietnamese", title: "Tasty Saigon", text: "Huge portions — one dish is almost enough for two.", tags: ["Tilburg"] },
+
+      // --- Indonesian ---
+      { emoji: "🍚", category: "Indonesian", title: "Berempah", text: "Authentic Indonesian with great desserts. Book ahead.", tags: ["The Hague"] },
+      { emoji: "🍚", category: "Indonesian", title: "Waroeng Padang Lapek", text: "Padang food — the beef rendang is out of this world.", tags: ["The Hague"] },
+      { emoji: "🍚", category: "Indonesian", title: "Toko Bersama West", text: "Build your own plate from loads of Indonesian dishes.", tags: ["Amsterdam"] },
+      { emoji: "🍚", category: "Indonesian", title: "Koeah", text: "Tastes like Indonesia — try the soto betawi.", tags: ["Amsterdam"] },
+      { emoji: "🍚", category: "Indonesian", title: "Toko Idola", text: "Cheap and cheerful counter food. Cash only.", tags: ["Delft"] },
+      { emoji: "🍚", category: "Indonesian", title: "Hing Ta Eethuis", text: "Generous portions with a Caribbean twist. Try the fried banana.", tags: ["Tilburg"] },
+      { emoji: "🍚", category: "Indonesian", title: "Gember & Sereh", text: "Asian dishes, gyoza and dim sum in a cosy room.", tags: ["Tilburg"] },
+
+      // --- Surinamese ---
+      { emoji: "🫓", category: "Surinamese", title: "New Meyva roti", text: "Roti people come back to every day of their trip.", tags: ["The Hague"] },
+      { emoji: "🫓", category: "Surinamese", title: "De Surinees", text: "Humble local spot — the roast chicken is a must.", tags: ["The Hague"] },
+      { emoji: "🫓", category: "Surinamese", title: "Simz Exotic Food", text: "Authentic Surinamese specialities in the Jordaan.", tags: ["Amsterdam"] },
+      { emoji: "🫓", category: "Surinamese", title: "Rotishop Gieta", text: "Homemade roti with chicken curry. Takeaway.", tags: ["Amsterdam"] },
+      { emoji: "🫓", category: "Surinamese", title: "Eetcafé Sarnami", text: "Friendly Surinamese café — try the bara or a combo plate.", tags: ["Delft"] },
+      { emoji: "🫓", category: "Surinamese", title: "Eethuis Ricanau", text: "Authentic Surinamese food in the centre.", tags: ["Tilburg"] },
+      { emoji: "🫓", category: "Surinamese", title: "Warung Asmara013", text: "Unassuming little warung with amazing food.", tags: ["Tilburg"] },
+
+      // --- French ---
+      { emoji: "🥖", category: "French", title: "Le Café", text: "Cosy French bistro on Oude Molstraat, loved for its steak.", tags: ["The Hague"] },
+      { emoji: "🥖", category: "French", title: "Bistro Catch-up Centrum", text: "Casual French bistro in the centre.", tags: ["The Hague"] },
+      { emoji: "🥖", category: "French", title: "Bouillon d'Amsterdam", text: "Paris-style bouillon: classic French dishes at low prices. Expect a queue.", tags: ["Amsterdam"] },
+      { emoji: "🥖", category: "French", title: "Brasserie Berns", text: "Charming brasserie — 'the best fries in a long while'.", tags: ["Delft"] },
+      { emoji: "🥖", category: "French", title: "LEF Restaurant & Bar", text: "One of Delft's oldest restaurants, French food on the Doelenplein.", tags: ["Delft"] },
+
+      // --- Greek ---
+      { emoji: "🫒", category: "Greek", title: "Taverna Ouzomezes", text: "Greek mezze to share in the centre.", tags: ["The Hague"] },
+      { emoji: "🫒", category: "Greek", title: "Mitsos Greek Traiterie", text: "Tastes just like Greece, with super friendly staff.", tags: ["Amsterdam"] },
+      { emoji: "🫒", category: "Greek", title: "Meat & Greek", text: "The best gyros in Amsterdam, according to many.", tags: ["Amsterdam"] },
+      { emoji: "🫒", category: "Greek", title: "GRK&ZO", text: "Eat outside on the square — big portions, quick service.", tags: ["Delft"] },
+      { emoji: "🫒", category: "Greek", title: "The Real Greek", text: "Greek restaurant and takeaway on the Markt.", tags: ["Delft"] },
+      { emoji: "🫒", category: "Greek", title: "Grieks restaurant Sirtaki", text: "Lovely staff and classic Greek dishes.", tags: ["Tilburg"] },
+      { emoji: "🫒", category: "Greek", title: "Minos Pallas", text: "Big, reliable Greek place on the Heuvelring.", tags: ["Tilburg"] },
+
+      // --- Middle Eastern ---
+      { emoji: "🧆", category: "Middle Eastern", title: "Baladi Manouche", text: "Hidden gem for Lebanese manoushe flatbreads — very cheap.", tags: ["The Hague"] },
+      { emoji: "🧆", category: "Middle Eastern", title: "Falafel en Hummus", text: "Vegetarian: falafel wraps and an amazing eggplant dish.", tags: ["The Hague"] },
+      { emoji: "🧆", category: "Middle Eastern", title: "Chef bulbol", text: "Lebanese mezze platters to share.", tags: ["The Hague"] },
+      { emoji: "🧆", category: "Middle Eastern", title: "Dabka", text: "One of the best Lebanese restaurants in Europe, say reviewers.", tags: ["Amsterdam"] },
+      { emoji: "🧆", category: "Middle Eastern", title: "Hummus Delft", text: "Share falafel, tajine and hummus. People come back the same day.", tags: ["Delft"] },
+      { emoji: "🧆", category: "Middle Eastern", title: "Pure Falafel", text: "Some of the best falafel in Europe — and cheap.", tags: ["Delft"] },
+      { emoji: "🧆", category: "Middle Eastern", title: "Shoarma Tilburg Eethuis", text: "Generous shoarma, open after midnight.", tags: ["Tilburg"] },
+
+      // --- Turkish ---
+      { emoji: "🥙", category: "Turkish", title: "Ahmet Usta Den Haag", text: "The grilled meat is the highlight.", tags: ["The Hague"] },
+      { emoji: "🥙", category: "Turkish", title: "Anatolian Chefs", text: "Called 'the best restaurant in the Netherlands' by one reviewer.", tags: ["The Hague"] },
+      { emoji: "🥙", category: "Turkish", title: "Ali Ocakbaşı", text: "Turkish grill on the Herengracht — very popular, book ahead.", tags: ["Amsterdam"] },
+      { emoji: "🥙", category: "Turkish", title: "Tuana Grill", text: "Home-style Turkish grill and mezze, loved by Turkish locals.", tags: ["Amsterdam"] },
+      { emoji: "🥙", category: "Turkish", title: "Samara Grill House", text: "Adana kebab and huge BBQ platters to share.", tags: ["Delft"] },
+      { emoji: "🥙", category: "Turkish", title: "Restaurant Urla", text: "Turkish-Mediterranean with seafood, in the old centre.", tags: ["Delft"] },
+      { emoji: "🥙", category: "Turkish", title: "Masal Restaurant", text: "Wide Turkish menu, plus a great weekend breakfast buffet.", tags: ["Tilburg"] },
+
+      // --- Mexican ---
+      { emoji: "🌮", category: "Mexican", title: "KUA Cocina Mexicana", text: "Cosy and authentic — like teleporting to Mexico.", tags: ["The Hague"] },
+      { emoji: "🌮", category: "Mexican", title: "QUERU Cantina Mexicana", text: "Great tacos and a hibiscus margarita.", tags: ["The Hague"] },
+      { emoji: "🌮", category: "Mexican", title: "TACO LINDO De Pijp", text: "Fantastic tacos with lots of toppings to add.", tags: ["Amsterdam"] },
+      { emoji: "🌮", category: "Mexican", title: "La Brutal", text: "Super legit taqueria in De Pijp.", tags: ["Amsterdam"] },
+      { emoji: "🌮", category: "Mexican", title: "Hermanos", text: "Latin American food — a quick trip to South America.", tags: ["Delft"] },
+      { emoji: "🌮", category: "Mexican", title: "Alma Mexican Soul Food", text: "In the Foodmarket. A Mexican reviewer says it tastes like home.", tags: ["Tilburg"] },
+
+      // --- Spanish ---
+      { emoji: "🥘", category: "Spanish", title: "Triana Tapasbar & Restaurant", text: "Lots of tapas to choose from. Get the chorizo.", tags: ["The Hague"] },
+      { emoji: "🥘", category: "Spanish", title: "Pan y Vino", text: "Spanish and Portuguese food at affordable prices.", tags: ["The Hague"] },
+      { emoji: "🥘", category: "Spanish", title: "Mamas & Tapas", text: "Cosy and friendly — order lots of small plates to share.", tags: ["Amsterdam"] },
+      { emoji: "🥘", category: "Spanish", title: "Tubo", text: "Great vibes and tapas. Try the tuna tataki and croquetas.", tags: ["Tilburg"] },
+
+      // --- Bakeries: The Hague ---
+      { emoji: "🥐", category: "Bakeries", title: "Pompernikkel", text: "Organic bakery loved for its sourdough and croissants. Get a cinnamon scroll.", tags: ["The Hague"] },
+      { emoji: "🍞", category: "Bakeries", title: "Bartine Bakery & Market", text: "Artisan bread and a little market — a newer local favourite.", tags: ["The Hague"] },
+      { emoji: "🍫", category: "Bakeries", title: "Philippe Galerne", text: "French patisserie famous for its éclairs and croissants. Worth the queue.", tags: ["The Hague"] },
+      { emoji: "🥖", category: "Bakeries", title: "Boulangerie Michel", text: "Authentic French breads and pastries; stay for breakfast or lunch.", tags: ["The Hague"] },
+      { emoji: "🍰", category: "Bakeries", title: "'t Bakkertje", text: "Central little bakery — try the truffle cake and banana bread.", tags: ["The Hague"] },
+      { emoji: "🌾", category: "Bakeries", title: "Vlaamsch Broodhuys Bankastraat", text: "Artisan breads, pastries and breakfast in a pretty shopping street.", tags: ["The Hague"] },
+      { emoji: "🧁", category: "Bakeries", title: "The Welsh Bakestone", text: "Completely gluten-free bakery and patisserie.", tags: ["The Hague", "gluten-free"] },
+
+      // --- Bakeries: Delft ---
+      { emoji: "💛", category: "Bakeries", title: "Bombina", text: "Cosy brunch café with yellow awnings, run by a brother and sister: cinnamon rolls, carrot cake, ricotta hotcakes. Check opening hours on their Instagram before you go.", tags: ["Delft"] },
+      { emoji: "💍", category: "Bakeries", title: "Stadsbakkerij De Diamanten Ring", text: "Delft's historic bakery, baking since the 1600s, in a beautiful old building.", tags: ["Delft"] },
+      { emoji: "🥨", category: "Bakeries", title: "Meneer Leffers", text: "Trendy artisan bakery — canelés, focaccia and more.", tags: ["Delft"] },
+
+      // --- Bakeries: Tilburg ---
+      { emoji: "🥐", category: "Bakeries", title: "Alma BroodLab", text: "Open bakery by the Piushaven where you can watch them bake. Famous pain au chocolat, and a different weekend special every week.", tags: ["Tilburg"] },
+      { emoji: "🕰️", category: "Bakeries", title: "Van Vlerken", text: "Old-fashioned bakery and tearoom with an antique till and real hot chocolate.", tags: ["Tilburg"] },
+      { emoji: "🥜", category: "Bakeries", title: "Zoete Moed", text: "Small bakery with cakes people rave about — great for birthdays.", tags: ["Tilburg"] },
+      { emoji: "🍞", category: "Bakeries", title: "Tilburg Sourdough", text: "Sourdough in a beautiful bakery on Willem II Straat.", tags: ["Tilburg"] },
+      { emoji: "🌿", category: "Bakeries", title: "Bakkerij van Planten", text: "Vegan cakes, cheesecakes and cream truffles. Pre-order only.", tags: ["Tilburg", "vegan"] },
+    ]
+  },
+
+  travel: {
+    label: "✈️ Travel",
+    items: [
+      { emoji: "🧇", title: "Bruges", text: "Canals, chocolate and cobblestones. Easy weekend by train.", tags: ["weekend", "Belgium"] },
+      { emoji: "💎", title: "Antwerp", text: "Fashion, food halls and a gorgeous train station.", tags: ["weekend", "Belgium"] },
+      { emoji: "🏰", title: "Ghent", text: "Medieval canals, a real castle in the city centre, and the Graslei lit up at night.", tags: ["weekend", "Belgium"] },
+      { emoji: "🥐", title: "Paris", text: "Picnic by the Seine, get lost in Montmartre, eat too many pastries.", tags: ["city", "France"] },
+      { emoji: "🌸", title: "Colmar", text: "Fairytale Alsace town with colourful half-timbered houses and canals in 'Little Venice'.", tags: ["weekend", "France", "village"] },
+      { emoji: "🍷", title: "Riquewihr", text: "Tiny walled wine village in Alsace — wine tasting and a magical Christmas market.", tags: ["weekend", "France", "village"] },
+      { emoji: "🌀", title: "Eguisheim", text: "Alsace village built in circles around its castle, full of flowers.", tags: ["weekend", "France", "village"] },
+      { emoji: "🪷", title: "Giverny", text: "Monet's house and water-lily garden, an easy day trip from Paris.", tags: ["day trip", "France", "village"] },
+      { emoji: "🌊", title: "Étretat", text: "Normandy village with dramatic white cliffs and arches over the sea.", tags: ["weekend", "France", "village"] },
+      { emoji: "⛵", title: "Honfleur", text: "Postcard harbour in Normandy with tall, colourful houses.", tags: ["weekend", "France", "village"] },
+      { emoji: "🏝️", title: "Mont-Saint-Michel", text: "Abbey on a rocky island that turns into an island at high tide.", tags: ["weekend", "France", "village"] },
+      { emoji: "💙", title: "Annecy", text: "Canals, flowers and the bluest lake in the French Alps.", tags: ["big trip", "France", "village"] },
+      { emoji: "💜", title: "Gordes", text: "Hilltop village in Provence — go in July for the lavender fields.", tags: ["big trip", "France", "village", "summer"] },
+      { emoji: "🧡", title: "Roussillon", text: "Provence village painted in ochre reds and oranges.", tags: ["big trip", "France", "village", "summer"] },
+      { emoji: "⛰️", title: "Rocamadour", text: "Village built straight into a cliff in the Dordogne.", tags: ["big trip", "France", "village"] },
+      { emoji: "🌿", title: "Saint-Cirq-Lapopie", text: "Medieval village perched above the Lot river — once voted France's favourite.", tags: ["big trip", "France", "village"] },
+      { emoji: "🏝️", title: "Texel", text: "Island escape: bikes, beaches, sheep and seafood.", tags: ["weekend", "Netherlands", "nature"] },
+      { emoji: "🛶", title: "Giethoorn", text: "A village with canals instead of roads — rent a little boat.", tags: ["day trip", "Netherlands", "village"] },
+
+      // --- Cute villages: Netherlands ---
+      { emoji: "🌬️", title: "Zaanse Schans", text: "Working windmills, wooden houses and cheese tastings, just outside Amsterdam.", tags: ["day trip", "Netherlands", "village"] },
+      { emoji: "⚓", title: "Marken", text: "Green wooden fishermen's houses on a former island. Take the ferry to Volendam after.", tags: ["day trip", "Netherlands", "village"] },
+      { emoji: "🧀", title: "Edam", text: "Quiet canals, drawbridges and the famous cheese, without the crowds.", tags: ["day trip", "Netherlands", "village"] },
+      { emoji: "💨", title: "Kinderdijk", text: "Nineteen 18th-century windmills in a row — rent bikes and ride along them.", tags: ["day trip", "Netherlands", "village"] },
+      { emoji: "🤍", title: "Thorn", text: "The 'white village' in Limburg — every house is painted white.", tags: ["day trip", "Netherlands", "village"] },
+      { emoji: "🏘️", title: "Heusden", text: "Tiny fortified town with ramparts, a harbour and windmills, near Tilburg.", tags: ["day trip", "Netherlands", "village"] },
+      { emoji: "⭐", title: "Bourtange", text: "A perfect star-shaped fortress village in Groningen.", tags: ["weekend", "Netherlands", "village"] },
+      { emoji: "🎨", title: "Hindeloopen", text: "Painted furniture, little bridges and the IJsselmeer in Friesland.", tags: ["weekend", "Netherlands", "village"] },
+      { emoji: "🌾", title: "Veere", text: "Pretty harbour village in Zeeland on the Veerse Meer.", tags: ["weekend", "Netherlands", "village", "summer"] },
+      { emoji: "🏞️", title: "Valkenburg", text: "Hills, caves and a castle ruin — and a great Christmas market in the caves.", tags: ["weekend", "Netherlands", "village", "winter"] },
+      { emoji: "🎄", title: "Cologne", text: "Cathedral, river walks, and Christmas markets in winter.", tags: ["weekend", "Germany"] },
+      // --- Cute villages: Germany ---
+      { emoji: "🏚️", title: "Monschau", text: "Half-timbered houses along a river, just over the border. Lovely at Christmas.", tags: ["weekend", "Germany", "village", "winter"] },
+      { emoji: "🏰", title: "Cochem", text: "Castle on a hill above the Moselle, surrounded by vineyards.", tags: ["weekend", "Germany", "village"] },
+      { emoji: "🍇", title: "Beilstein", text: "Tiny Moselle wine village — called the 'Sleeping Beauty of the Moselle'.", tags: ["weekend", "Germany", "village"] },
+      { emoji: "🚢", title: "Bacharach", text: "Rhine village with castles and wine taverns. Take a Rhine boat trip.", tags: ["weekend", "Germany", "village"] },
+      { emoji: "📚", title: "Heidelberg", text: "Romantic old town, a castle ruin and the Philosophers' Walk.", tags: ["weekend", "Germany"] },
+      { emoji: "🧱", title: "Rothenburg ob der Tauber", text: "The most fairytale medieval town in Germany, with walls you can walk on.", tags: ["big trip", "Germany", "village"] },
+      { emoji: "🍺", title: "Bamberg", text: "UNESCO old town with a town hall on a bridge and smoked beer.", tags: ["big trip", "Germany"] },
+      { emoji: "🪵", title: "Quedlinburg", text: "Over 1,300 half-timbered houses in the Harz mountains.", tags: ["big trip", "Germany", "village"] },
+      { emoji: "🏖️", title: "Lindau", text: "Island town on Lake Constance with the Alps in the background.", tags: ["big trip", "Germany", "village", "summer"] },
+      { emoji: "🎻", title: "Mittenwald", text: "Alpine village with painted houses below the mountains.", tags: ["big trip", "Germany", "village", "nature"] },
+      { emoji: "🍕", title: "Naples", text: "Birthplace of pizza — chaotic, alive and delicious. Day trips to Pompeii and Capri.", tags: ["city", "Italy"] },
+      { emoji: "🛶", title: "Venice", text: "Get lost in the alleys, take a gondola, and see Burano's colourful houses.", tags: ["city", "Italy"] },
+      { emoji: "💌", title: "Verona", text: "The city of Romeo and Juliet, with a Roman arena where operas play in summer.", tags: ["city", "Italy"] },
+      { emoji: "🏖️", title: "Sardinia", text: "Turquoise water, wild coves and pretty towns. Tap to see places to visit.", tags: ["big trip", "Italy", "summer"], opens: "sardinia" },
+      { emoji: "🍋", title: "Sicily", text: "Baroque towns, Etna, Greek temples and the best cannoli. Tap to see places to visit.", tags: ["big trip", "Italy", "summer"], opens: "sicily" },
+      { emoji: "🍋", title: "Amalfi Coast", text: "Lemons, cliffs, swimming and long dinners. A summer dream trip.", tags: ["big trip", "Italy", "summer"] },
+
+      // --- China: south-west nature (UNESCO) ---
+      { emoji: "💎", title: "Jiuzhaigou Valley", text: "Turquoise lakes and waterfalls in the Sichuan mountains — most beautiful in autumn. Book tickets ahead.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🏞️", title: "Huanglong", text: "Terraced travertine pools in gold and blue, high up (around 3,000–3,500 m) — take it slow.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🐼", title: "Giant Panda Sanctuaries", text: "The mountains where wild pandas live, near Chengdu. Visit a panda base early in the morning.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🙏", title: "Mount Emei & Leshan Giant Buddha", text: "Sacred mountain with monasteries, and a giant Buddha carved into a cliff by the river.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🌊", title: "Three Parallel Rivers & Tiger Leaping Gorge", text: "Three huge rivers side by side in deep gorges — hike the Tiger Leaping Gorge trail.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🏔️", title: "Shangri-La", text: "Tibetan culture, monasteries and alpine meadows at 3,300 m in northern Yunnan.", tags: ["big trip", "China", "nature"] },
+      { emoji: "🏮", title: "Lijiang & Dali", text: "Old towns with canals and courtyards — the classic bases for Yunnan.", tags: ["big trip", "China", "UNESCO"] },
+      { emoji: "🪨", title: "Shilin Stone Forest", text: "A forest of tall limestone pillars near Kunming.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🌾", title: "Yuanyang Rice Terraces", text: "Hani rice terraces — flooded and glowing at sunrise from about December to March.", tags: ["big trip", "China", "UNESCO", "nature", "winter"] },
+      { emoji: "🌉", title: "Wulong Karst", text: "Giant natural stone bridges and deep sinkholes near Chongqing.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🌿", title: "Libo Karst", text: "Jungle, emerald rivers and little waterfalls in Guizhou.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "⛩️", title: "Fanjingshan", text: "Misty mountain with a temple balanced on top of a rock pillar.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🏙️", title: "Shanghai", text: "The Bund skyline at night, old water towns nearby, and amazing soup dumplings. A good start or end point.", tags: ["city", "China"] },
+      { emoji: "🌫️", title: "Zhangjiajie", text: "Sandstone pillars rising out of the mist (the 'Avatar' mountains), a glass bridge and Tianmen Mountain.", tags: ["big trip", "China", "UNESCO", "nature"] },
+      { emoji: "🚣", title: "Guilin & Yangshuo", text: "The classic karst peaks — Li River boat trip and cycling through the countryside.", tags: ["big trip", "China", "UNESCO", "nature"] },
+    ]
+  }
+};
+
+
+/* =========================================================
+   MUSEUM LIST (opens when you tap "Museum date")
+   To add a museum: copy one { ... } line inside a group.
+   ========================================================= */
+
+const SUBLISTS = {
+  museums: {
+    title: "🖼️ Museums",
+    groups: [
+      { name: "The Hague", city: "Den Haag", items: [
+        { name: "Mauritshuis", text: "Dutch Golden Age masterpieces, including Girl with a Pearl Earring." },
+        { name: "Kunstmuseum Den Haag", text: "Huge Art Deco museum with the world's biggest Mondriaan collection." },
+        { name: "KM21", text: "Contemporary art right next to the Kunstmuseum." },
+        { name: "Escher in Het Paleis", text: "Mind-bending Escher prints inside a former royal palace." },
+        { name: "Panorama Mesdag", text: "A 360° painting of Scheveningen beach from 1881 — you stand in the middle of it." },
+        { name: "De Mesdag Collectie", text: "Hague School and French landscape painting in Mesdag's old home." },
+        { name: "Gevangenpoort", text: "The medieval Prison Gate — dungeons, torture tools, and grim stories." },
+        { name: "Galerij Prins Willem V", text: "An 18th-century gallery with paintings hung floor to ceiling." },
+        { name: "Museum Bredius", text: "Golden Age paintings in an intimate canal-side house." },
+        { name: "Haags Historisch Museum", text: "The story of The Hague, right by the Hofvijver." },
+        { name: "Fotomuseum Den Haag", text: "Photography exhibitions that change every few months." },
+        { name: "Louwman Museum", text: "A gorgeous collection of vintage and classic cars." },
+        { name: "Museon-Omniversum", text: "Science and nature museum with a giant dome cinema." },
+        { name: "Beelden aan Zee", text: "Sculpture museum built into the dunes at Scheveningen." },
+        { name: "Muzee Scheveningen", text: "Fishing village history and life by the sea." },
+        { name: "Madurodam", text: "The whole Netherlands in miniature — silly and fun." },
+        { name: "Huis van het Boek", text: "One of the oldest book museums in the world." },
+      ]},
+      { name: "Tilburg", city: "Tilburg", items: [
+        { name: "De Pont", text: "Contemporary art in a huge former wool-spinning mill." },
+        { name: "TextielMuseum", text: "A working textile factory-museum — watch fabrics being made." },
+        { name: "Natuurmuseum Brabant", text: "Fossils, an Ice Age exhibition and a sperm whale, opposite the station." },
+        { name: "Vincents Tekenlokaal", text: "Reconstruction of the classroom where young Van Gogh had his first drawing lessons." },
+        { name: "Museum Zusters van Liefde", text: "History of the Sisters of Charity of Tilburg." },
+        { name: "Peerke Donders Paviljoen", text: "Small museum about Tilburg's famous 19th-century priest." },
+        { name: "Lustwarande", text: "Outdoor sculpture exhibition in the Oude Warande park (summer only)." },
+      ]},
+      { name: "Most popular in the Netherlands", city: "", items: [
+        { name: "Rijksmuseum", city: "Amsterdam", text: "Rembrandt's Night Watch and the national treasures." },
+        { name: "Van Gogh Museum", city: "Amsterdam", text: "The largest Van Gogh collection in the world. Book ahead." },
+        { name: "Anne Frank House", city: "Amsterdam", text: "The secret annex. Tickets sell out weeks in advance." },
+        { name: "Stedelijk Museum", city: "Amsterdam", text: "Modern art and design, from Malevich to today." },
+        { name: "NEMO Science Museum", city: "Amsterdam", text: "Hands-on science with a rooftop view over the city." },
+        { name: "Eye Filmmuseum", city: "Amsterdam", text: "Film museum and cinema across the IJ — take the free ferry." },
+        { name: "Moco Museum", city: "Amsterdam", text: "Banksy and modern street art in a villa on Museumplein." },
+        { name: "Rembrandthuis", city: "Amsterdam", text: "The house where Rembrandt lived and worked." },
+        { name: "Het Scheepvaartmuseum", city: "Amsterdam", text: "Maritime museum with a full-size replica ship." },
+        { name: "Kröller-Müller Museum", city: "Otterlo", text: "Van Goghs and a sculpture garden inside the Hoge Veluwe national park." },
+        { name: "Nederlands Openluchtmuseum", city: "Arnhem", text: "Open-air museum with historic farms, windmills and trams." },
+        { name: "Paleis Het Loo", city: "Apeldoorn", text: "Royal palace with formal baroque gardens." },
+        { name: "Naturalis", city: "Leiden", text: "Natural history museum with real T. rex skeletons." },
+        { name: "Spoorwegmuseum", city: "Utrecht", text: "Railway museum with old trains and rides." },
+        { name: "Kasteel de Haar", city: "Utrecht", text: "A fairytale castle with beautiful grounds." },
+        { name: "Het Noordbrabants Museum", city: "'s-Hertogenbosch", text: "Art from Brabant, including Van Gogh and Bosch." },
+        { name: "Groninger Museum", city: "Groningen", text: "Wild, colourful building with art and design." },
+        { name: "Depot Boijmans Van Beuningen", city: "Rotterdam", text: "A mirrored bowl where you can see the whole art storage." },
+      ]},
+    ]
+  },
+
+  sardinia: {
+    title: "🏖️ Sardinia",
+    groups: [
+      { name: "Beaches & coves", city: "Sardinia", items: [
+        { name: "Cala Goloritzé", text: "Famous cove with a rock spire and clear water — reached by a hike. Entry is limited in summer, book ahead." },
+        { name: "Cala Luna", text: "Beach with caves in the Gulf of Orosei — go by boat from Cala Gonone." },
+        { name: "Spiaggia La Pelosa", text: "Caribbean-like water near Stintino. Book ahead in summer." },
+        { name: "La Maddalena Archipelago", text: "Islands with pink and white beaches — take a boat tour." },
+        { name: "Chia", text: "Golden dunes and turquoise water in the south." },
+        { name: "Villasimius", text: "White beaches and clear water near Cagliari." },
+      ]},
+      { name: "Cute towns", city: "Sardinia", items: [
+        { name: "Bosa", text: "Rainbow-coloured houses along a river, below a castle." },
+        { name: "Alghero", text: "Catalan-style old town with sea walls — perfect for sunset." },
+        { name: "Castelsardo", text: "Medieval village perched on a rock above the sea." },
+        { name: "Cagliari", text: "The capital: hilltop old quarter, flamingos and the Poetto beach." },
+        { name: "Porto Cervo", text: "Glamorous Costa Smeralda harbour — great for people-watching." },
+        { name: "Su Nuraxi di Barumini", text: "Mysterious Bronze Age stone towers (UNESCO)." },
+      ]},
+    ]
+  },
+
+  sicily: {
+    title: "🍋 Sicily",
+    groups: [
+      { name: "Cute towns", city: "Sicily", items: [
+        { name: "Taormina", text: "Hilltop town with a Greek theatre overlooking Etna and the sea." },
+        { name: "Cefalù", text: "Beach town with a Norman cathedral and a rock to hike up." },
+        { name: "Ortigia (Syracuse)", text: "Tiny island old town with a gorgeous market and swimming spots." },
+        { name: "Noto", text: "Golden baroque town — try the almond granita." },
+        { name: "Ragusa Ibla", text: "Baroque town on a hill, magical at night." },
+        { name: "Modica", text: "Famous for its gritty, ancient-recipe chocolate." },
+        { name: "Erice", text: "Medieval hilltop village in the clouds — eat the almond pastries." },
+        { name: "Marzamemi", text: "Tiny fishing village with a piazza by the sea." },
+        { name: "Palermo", text: "Street food, markets and wild energy." },
+      ]},
+      { name: "Nature & sights", city: "Sicily", items: [
+        { name: "Mount Etna", text: "Hike or take the cable car up Europe's most active volcano." },
+        { name: "Valley of the Temples (Agrigento)", text: "Some of the best-preserved Greek temples in the world." },
+        { name: "Scala dei Turchi", text: "Bright white cliff steps above the sea — view it from the beach below." },
+        { name: "San Vito Lo Capo", text: "Long white beach with turquoise water." },
+        { name: "Aeolian Islands", text: "Volcanic islands — Lipari, Salina and Stromboli's glowing crater." },
+        { name: "Favignana", text: "Butterfly-shaped island with incredible swimming coves — explore by bike." },
+      ]},
+    ]
+  }
+};
+
+/* =========================================================
+   You don't need to edit anything below this line.
+   ========================================================= */
+
+const STORAGE_KEY = "our-little-list-done";
+let done = {};
+try { done = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) { done = {}; }
+function saveDone() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(done)); } catch (e) {}
+}
+
+let currentSection = "dates";
+let currentTag = "all";
+
+const tabsEl = document.getElementById("tabs");
+const chipsEl = document.getElementById("chips");
+const gridEl = document.getElementById("grid");
+const progressEl = document.getElementById("progress");
+
+function idFor(section, item) { return section + "::" + item.title; }
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function renderTabs() {
+  tabsEl.innerHTML = "";
+  Object.entries(SECTIONS).forEach(([key, sec]) => {
+    const b = document.createElement("button");
+    b.textContent = sec.label;
+    if (key === currentSection) b.classList.add("active");
+    b.onclick = () => { currentSection = key; currentTag = "all"; render(); };
+    tabsEl.appendChild(b);
+  });
+}
+
+function renderChips() {
+  const sec = SECTIONS[currentSection];
+  const items = sec.items;
+  const tags = sec.categories || [...new Set(items.flatMap(i => i.tags || []))];
+  chipsEl.innerHTML = "";
+  ["all", ...tags].forEach(t => {
+    const c = document.createElement("button");
+    c.className = "chip" + (t === currentTag ? " active" : "");
+    const n = sec.categories && t !== "all" ? items.filter(i => i.category === t).length : 0;
+    c.textContent = t === "all" ? "All" : (sec.categories ? `${t}${n ? " · " + n : ""}` : t);
+    c.onclick = () => { currentTag = t; render(); };
+    chipsEl.appendChild(c);
+  });
+}
+
+function visibleItems() {
+  const sec = SECTIONS[currentSection];
+  const items = sec.items;
+  if (currentTag === "all") return items;
+  return sec.categories ? items.filter(i => i.category === currentTag) : items.filter(i => (i.tags || []).includes(currentTag));
+}
+
+function renderGrid(highlightTitle) {
+  const items = visibleItems();
+  gridEl.innerHTML = "";
+  if (!items.length) {
+    gridEl.innerHTML = `<div class="empty">No ${currentTag === "all" ? "" : escapeHtml(currentTag) + " "}places yet — add your favourites!</div>`;
+    return;
+  }
+  items.forEach(item => {
+    const id = idFor(currentSection, item);
+    const isDone = !!done[id];
+    const card = document.createElement("div");
+    card.className = "card" + (isDone ? " is-done" : "") + (item.title === highlightTitle ? " highlight" : "");
+    const doneLabel = currentSection === "travel" ? "Been there" : currentSection === "restaurants" ? "Tried it" : "Done it";
+    card.innerHTML = `
+      <div class="emoji">${escapeHtml(item.emoji || "💛")}</div>
+      <h3>${escapeHtml(item.title)}</h3>
+      <p>${escapeHtml(item.text || "")}</p>
+      <div class="meta">${[item.category, ...(item.tags || [])].filter(Boolean).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
+      ${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">Open link →</a>` : (item.category ? `<a href="${mapsLink(item.title, (item.tags || [])[0])}" target="_blank" rel="noopener">Map →</a>` : "")}
+      ${item.opens && SUBLISTS[item.opens] ? `<button class="open-list">See the list →</button>` : ""}
+      <label><input type="checkbox" ${isDone ? "checked" : ""}> ${doneLabel}</label>
+    `;
+    const openBtn = card.querySelector(".open-list");
+    if (openBtn) openBtn.onclick = () => openSublist(item.opens);
+    card.querySelector("input").onchange = e => {
+      if (e.target.checked) done[id] = true; else delete done[id];
+      saveDone();
+      render();
+    };
+    gridEl.appendChild(card);
+    if (item.title === highlightTitle) card.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+}
+
+function renderProgress() {
+  const items = SECTIONS[currentSection].items;
+  const count = items.filter(i => done[idFor(currentSection, i)]).length;
+  progressEl.textContent = `${count} of ${items.length} ticked off`;
+}
+
+function render(highlightTitle) {
+  renderTabs();
+  renderChips();
+  renderProgress();
+  renderGrid(highlightTitle);
+}
+
+document.getElementById("surprise").onclick = () => {
+  const pool = visibleItems().filter(i => !done[idFor(currentSection, i)]);
+  const list = pool.length ? pool : visibleItems();
+  if (!list.length) return;
+  const pick = list[Math.floor(Math.random() * list.length)];
+  render(pick.title);
+};
+
+
+/* ---------- Pop-up list (museums) ---------- */
+const overlay = document.getElementById("overlay");
+const panel = document.getElementById("panel");
+let openKey = null;
+
+function mapsLink(name, city) {
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name + " " + (city || ""));
+}
+
+function openSublist(key) {
+  openKey = key;
+  const list = SUBLISTS[key];
+  const all = list.groups.flatMap(g => g.items);
+  const seen = all.filter(i => done["sub::" + key + "::" + i.name]).length;
+  panel.innerHTML = `
+    <div class="panel-head">
+      <h2>${escapeHtml(list.title)}</h2>
+      <button class="close" aria-label="Close">×</button>
+    </div>
+    <div class="progress">${seen} of ${all.length} ${key === "museums" ? "visited" : "been there"}</div>
+    ${list.groups.map(g => `
+      <h3 class="group">${escapeHtml(g.name)}</h3>
+      <ul class="sub">
+        ${g.items.map(i => {
+          const id = "sub::" + key + "::" + i.name;
+          const city = i.city || g.city;
+          return `<li class="${done[id] ? "is-done" : ""}">
+            <label><input type="checkbox" data-id="${escapeHtml(id)}" ${done[id] ? "checked" : ""}></label>
+            <div>
+              <strong>${escapeHtml(i.name)}</strong>${i.city ? ` <span class="tag">${escapeHtml(i.city)}</span>` : ""}
+              <p>${escapeHtml(i.text || "")}</p>
+              <a href="${mapsLink(i.name, city)}" target="_blank" rel="noopener">Map →</a>
+            </div>
+          </li>`;
+        }).join("")}
+      </ul>`).join("")}
+  `;
+  panel.querySelector(".close").onclick = closeSublist;
+  panel.querySelectorAll("input[data-id]").forEach(cb => {
+    cb.onchange = e => {
+      const id = e.target.dataset.id;
+      if (e.target.checked) done[id] = true; else delete done[id];
+      saveDone();
+      const scroll = panel.scrollTop;
+      openSublist(key);
+      panel.scrollTop = scroll;
+    };
+  });
+  overlay.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSublist() {
+  overlay.classList.remove("show");
+  document.body.style.overflow = "";
+  openKey = null;
+}
+overlay.addEventListener("click", e => { if (e.target === overlay) closeSublist(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && openKey) closeSublist(); });
+
+render();
+</script>
+</body>
+</html>
